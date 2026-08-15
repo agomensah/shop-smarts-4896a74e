@@ -41,6 +41,7 @@ type Product = {
   name: string;
   category: string;
   price: number;
+  cost_price: number;
   stock_quantity: number;
   low_stock_threshold: number;
 };
