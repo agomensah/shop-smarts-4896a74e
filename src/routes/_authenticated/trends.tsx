@@ -44,12 +44,20 @@ function TrendsPage() {
     queryKey: ["trends", since],
     queryFn: async () => {
       const [sales, items] = await Promise.all([
-        supabase.from("sales").select("id, total, created_at").gte("created_at", since),
-        supabase.from("sale_items").select("product_name, quantity, line_total, created_at").gte("created_at", since),
+        supabase
+          .from("sales")
+          .select("id, total, created_at")
+          .is("voided_at", null)
+          .gte("created_at", since),
+        supabase
+          .from("sale_items")
+          .select("product_name, quantity, line_total, unit_cost, created_at, sale!inner(voided_at)")
+          .is("sale.voided_at", null)
+          .gte("created_at", since),
       ]);
       if (sales.error) throw sales.error;
       if (items.error) throw items.error;
-      return { sales: sales.data, items: items.data };
+      return { sales: sales.data, items: items.data as (typeof items.data)[number][] };
     },
   });
 
@@ -63,6 +71,10 @@ function TrendsPage() {
   const revenue30 = sales.reduce((sum, s) => sum + Number(s.total), 0);
   const salesToday = sales.filter((s) => new Date(s.created_at).toDateString() === todayKey).length;
   const avgSale = sales.length ? revenue30 / sales.length : 0;
+  const profit30 = items.reduce(
+    (sum, i) => sum + (Number(i.line_total) - Number(i.unit_cost) * i.quantity),
+    0,
+  );
 
   const daily = useMemo(() => {
     const buckets = new Map<string, number>();
@@ -96,6 +108,7 @@ function TrendsPage() {
     { label: "Revenue today", value: formatCedis(revenueToday) },
     { label: "Sales today", value: String(salesToday) },
     { label: "Revenue (30 days)", value: formatCedis(revenue30) },
+    { label: "Profit (30 days)", value: formatCedis(profit30) },
     { label: "Average sale", value: formatCedis(avgSale) },
   ];
 
@@ -106,7 +119,7 @@ function TrendsPage() {
         <p className="text-sm text-muted-foreground">Last 30 days of school shop activity</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.label} className="shadow-card">
             <CardContent className="py-5">
