@@ -27,10 +27,14 @@ export const Route = createFileRoute("/_authenticated/inventory")({
       { title: "Stock & Products | ShopDesk School Shop" },
       {
         name: "description",
-        content: "Manage school shop products, prices in cedis, restocking and low-stock alerts in one place.",
+        content:
+          "Manage school shop products, prices in cedis, restocking and low-stock alerts in one place.",
       },
       { property: "og:title", content: "Stock & Products | ShopDesk School Shop" },
-      { property: "og:description", content: "Track quantities and get alerted before items run out." },
+      {
+        property: "og:description",
+        content: "Track quantities and get alerted before items run out.",
+      },
     ],
   }),
   component: InventoryPage,
@@ -251,7 +255,10 @@ function InventoryPage() {
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                  <TableCell
+                    colSpan={7}
+                    className="py-10 text-center text-sm text-muted-foreground"
+                  >
                     No products yet.
                   </TableCell>
                 </TableRow>
@@ -263,7 +270,9 @@ function InventoryPage() {
                     <TableCell className="text-right">{formatCedis(p.price)}</TableCell>
                     <TableCell className="text-right">
                       {p.cost_price > 0 ? (
-                        <span className={p.price - p.cost_price < 0 ? "text-destructive" : undefined}>
+                        <span
+                          className={p.price - p.cost_price < 0 ? "text-destructive" : undefined}
+                        >
                           {formatCedis(p.price - p.cost_price)}
                           <span className="ml-1 text-xs text-muted-foreground">
                             {p.price > 0
@@ -276,7 +285,11 @@ function InventoryPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Badge variant={p.stock_quantity <= p.low_stock_threshold ? "destructive" : "secondary"}>
+                      <Badge
+                        variant={
+                          p.stock_quantity <= p.low_stock_threshold ? "destructive" : "secondary"
+                        }
+                      >
                         {p.stock_quantity}
                       </Badge>
                     </TableCell>
@@ -287,9 +300,7 @@ function InventoryPage() {
                             key={amount}
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              restock.mutate({ id: p.id, amount })
-                            }
+                            onClick={() => restock.mutate({ id: p.id, amount })}
                           >
                             +{amount}
                           </Button>

@@ -29,7 +29,8 @@ export const Route = createFileRoute("/_authenticated/sales")({
       { title: "Sales History | ShopDesk School Shop" },
       {
         name: "description",
-        content: "Browse every school shop transaction with items sold, payment method and the staff member who served.",
+        content:
+          "Browse every school shop transaction with items sold, payment method and the staff member who served.",
       },
       { property: "og:title", content: "Sales History | ShopDesk School Shop" },
       { property: "og:description", content: "A searchable record of all school shop sales." },
@@ -142,8 +143,9 @@ function SalesPage() {
                   <CardContent className="flex flex-wrap items-start justify-between gap-4 py-4">
                     <div className="min-w-0">
                       <p className="text-sm font-medium">
-                        {sale.sale_items.map((i) => `${i.product_name} ×${i.quantity}`).join(", ") ||
-                          "No items"}
+                        {sale.sale_items
+                          .map((i) => `${i.product_name} ×${i.quantity}`)
+                          .join(", ") || "No items"}
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {formatDateTime(sale.created_at)} · {nameFor(sale.cashier_id)}
@@ -181,8 +183,8 @@ function SalesPage() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Void this sale?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                The sale stays on the record but its items go back into stock.
-                                This can't be undone.
+                                The sale stays on the record but its items go back into stock. This
+                                can't be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <Input

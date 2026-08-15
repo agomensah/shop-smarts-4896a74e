@@ -74,7 +74,10 @@ function Landing() {
       <section className="mx-auto max-w-5xl px-4 py-16">
         <div className="grid gap-5 md:grid-cols-3">
           {features.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="rounded-xl border border-border bg-card p-6 shadow-card">
+            <article
+              key={title}
+              className="rounded-xl border border-border bg-card p-6 shadow-card"
+            >
               <span className="inline-flex size-10 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
                 <Icon className="size-5" />
               </span>
