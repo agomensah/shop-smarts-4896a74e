@@ -232,6 +232,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      adjust_stock: {
+        Args: {
+          _delta: number
+          _movement_type?: Database["public"]["Enums"]["stock_movement_type"]
+          _note?: string
+          _product_id: string
+        }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -242,6 +251,10 @@ export type Database = {
       record_sale: {
         Args: { _items: Json; _payment_method: string }
         Returns: string
+      }
+      void_sale: {
+        Args: { _reason?: string; _sale_id: string }
+        Returns: undefined
       }
     }
     Enums: {
