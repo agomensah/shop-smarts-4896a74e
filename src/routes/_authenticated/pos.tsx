@@ -99,29 +99,12 @@ function PosPage() {
 
   const checkout = useMutation({
     mutationFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      const cashierId = userData.user?.id;
-      if (!cashierId) throw new Error("Session expired, please sign in again.");
-
-      const { data: sale, error: saleError } = await supabase
-        .from("sales")
-        .insert({ cashier_id: cashierId, total, payment_method: payment })
-        .select("id")
-        .single();
-      if (saleError) throw saleError;
-
-      const { error: itemsError } = await supabase.from("sale_items").insert(
-        cart.map((l) => ({
-          sale_id: sale.id,
-          product_id: l.product.id,
-          product_name: l.product.name,
-          quantity: l.qty,
-          unit_price: l.product.price,
-          line_total: l.product.price * l.qty,
-        })),
-      );
-      if (itemsError) throw itemsError;
-      return sale.id;
+      const { data, error } = await supabase.rpc("record_sale", {
+        _payment_method: payment,
+        _items: cart.map((l) => ({ product_id: l.product.id, quantity: l.qty })),
+      });
+      if (error) throw new Error(error.message);
+      return data;
     },
     onSuccess: () => {
       toast.success(`Sale recorded — ${formatCedis(total)}`);
@@ -130,7 +113,10 @@ function PosPage() {
       queryClient.invalidateQueries({ queryKey: ["sales"] });
       queryClient.invalidateQueries({ queryKey: ["trends"] });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) => {
+      toast.error(error.message);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
   });
 
   return (
