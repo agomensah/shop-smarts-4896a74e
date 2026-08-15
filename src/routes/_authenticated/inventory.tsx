@@ -56,6 +56,7 @@ function InventoryPage() {
     name: "",
     category: "General",
     price: "",
+    cost_price: "",
     stock_quantity: "",
     low_stock_threshold: "5",
   });
@@ -65,7 +66,7 @@ function InventoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, category, price, stock_quantity, low_stock_threshold")
+        .select("id, name, category, price, cost_price, stock_quantity, low_stock_threshold")
         .order("name");
       if (error) throw error;
       return data as Product[];
@@ -82,6 +83,7 @@ function InventoryPage() {
         name: form.name.trim(),
         category: form.category.trim() || "General",
         price: Number(form.price) || 0,
+        cost_price: Number(form.cost_price) || 0,
         stock_quantity: Number(form.stock_quantity) || 0,
         low_stock_threshold: Number(form.low_stock_threshold) || 5,
       });
@@ -89,19 +91,27 @@ function InventoryPage() {
     },
     onSuccess: () => {
       toast.success("Product added");
-      setForm({ name: "", category: "General", price: "", stock_quantity: "", low_stock_threshold: "5" });
+      setForm({
+        name: "",
+        category: "General",
+        price: "",
+        cost_price: "",
+        stock_quantity: "",
+        low_stock_threshold: "5",
+      });
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
   const restock = useMutation({
-    mutationFn: async ({ id, amount, current }: { id: string; amount: number; current: number }) => {
-      const { error } = await supabase
-        .from("products")
-        .update({ stock_quantity: Math.max(current + amount, 0) })
-        .eq("id", id);
-      if (error) throw error;
+    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
+      const { error } = await supabase.rpc("adjust_stock", {
+        _product_id: id,
+        _delta: amount,
+        _movement_type: "restock",
+      });
+      if (error) throw new Error(error.message);
     },
     onSuccess: invalidate,
     onError: (error: Error) => toast.error(error.message),
