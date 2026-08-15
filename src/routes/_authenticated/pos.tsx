@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCedis } from "@/lib/format";
 
@@ -18,7 +24,8 @@ export const Route = createFileRoute("/_authenticated/pos")({
       { title: "Point of Sale | ShopDesk School Shop" },
       {
         name: "description",
-        content: "Record school shop sales in seconds: pick items, take payment and update stock automatically.",
+        content:
+          "Record school shop sales in seconds: pick items, take payment and update stock automatically.",
       },
       { property: "og:title", content: "Point of Sale | ShopDesk School Shop" },
       { property: "og:description", content: "Fast till for school shop sales in Ghanaian cedis." },
@@ -155,7 +162,13 @@ function PosPage() {
                   <span className="font-display font-semibold text-primary">
                     {formatCedis(product.price)}
                   </span>
-                  <Badge variant={product.stock_quantity <= product.low_stock_threshold ? "destructive" : "secondary"}>
+                  <Badge
+                    variant={
+                      product.stock_quantity <= product.low_stock_threshold
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
                     {product.stock_quantity} left
                   </Badge>
                 </div>
@@ -183,11 +196,21 @@ function PosPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Button size="icon" variant="outline" className="size-7" onClick={() => changeQty(line.product.id, -1)}>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="size-7"
+                      onClick={() => changeQty(line.product.id, -1)}
+                    >
                       <Minus className="size-3" />
                     </Button>
                     <span className="w-6 text-center text-sm">{line.qty}</span>
-                    <Button size="icon" variant="outline" className="size-7" onClick={() => changeQty(line.product.id, 1)}>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="size-7"
+                      onClick={() => changeQty(line.product.id, 1)}
+                    >
                       <Plus className="size-3" />
                     </Button>
                   </div>
@@ -212,7 +235,9 @@ function PosPage() {
             </Select>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total</span>
-              <span className="font-display text-2xl font-bold text-primary">{formatCedis(total)}</span>
+              <span className="font-display text-2xl font-bold text-primary">
+                {formatCedis(total)}
+              </span>
             </div>
             <Button
               className="w-full"

@@ -23,7 +23,8 @@ export const Route = createFileRoute("/_authenticated/trends")({
       { title: "Sales Trends | ShopDesk School Shop" },
       {
         name: "description",
-        content: "See daily revenue, best-selling items and shop performance trends for the last 30 days in cedis.",
+        content:
+          "See daily revenue, best-selling items and shop performance trends for the last 30 days in cedis.",
       },
       { property: "og:title", content: "Sales Trends | ShopDesk School Shop" },
       { property: "og:description", content: "Daily revenue and top sellers for the school shop." },
@@ -51,7 +52,9 @@ function TrendsPage() {
           .gte("created_at", since),
         supabase
           .from("sale_items")
-          .select("product_name, quantity, line_total, unit_cost, created_at, sale!inner(voided_at)")
+          .select(
+            "product_name, quantity, line_total, unit_cost, created_at, sale!inner(voided_at)",
+          )
           .is("sale.voided_at", null)
           .gte("created_at", since),
       ]);
@@ -61,8 +64,8 @@ function TrendsPage() {
     },
   });
 
-  const sales = data?.sales ?? [];
-  const items = data?.items ?? [];
+  const sales = useMemo(() => data?.sales ?? [], [data]);
+  const items = useMemo(() => data?.items ?? [], [data]);
 
   const todayKey = new Date().toDateString();
   const revenueToday = sales
@@ -96,7 +99,11 @@ function TrendsPage() {
   const topItems = useMemo(() => {
     const map = new Map<string, { name: string; quantity: number; revenue: number }>();
     for (const item of items) {
-      const current = map.get(item.product_name) ?? { name: item.product_name, quantity: 0, revenue: 0 };
+      const current = map.get(item.product_name) ?? {
+        name: item.product_name,
+        quantity: 0,
+        revenue: 0,
+      };
       current.quantity += item.quantity;
       current.revenue += Number(item.line_total);
       map.set(item.product_name, current);
@@ -138,10 +145,21 @@ function TrendsPage() {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={daily}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} interval={4} stroke="var(--muted-foreground)" />
+              <XAxis
+                dataKey="day"
+                tick={{ fontSize: 11 }}
+                interval={4}
+                stroke="var(--muted-foreground)"
+              />
               <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" />
               <Tooltip formatter={(value: number) => formatCedis(value)} />
-              <Line type="monotone" dataKey="revenue" stroke="var(--chart-1)" strokeWidth={2.5} dot={false} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="var(--chart-1)"
+                strokeWidth={2.5}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

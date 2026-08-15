@@ -100,8 +100,8 @@ function AuthPage() {
           {pendingConfirm ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-muted-foreground">
-                We sent a confirmation link to <span className="font-medium">{email}</span>. Click it,
-                then sign in.
+                We sent a confirmation link to <span className="font-medium">{email}</span>. Click
+                it, then sign in.
               </p>
               <Button variant="outline" className="w-full" onClick={() => setPendingConfirm(false)}>
                 Back to sign in
@@ -184,7 +184,8 @@ function AuthPage() {
 
           <div className="mt-6 space-y-3">
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+              <span className="h-px flex-1 bg-border" /> or{" "}
+              <span className="h-px flex-1 bg-border" />
             </div>
             <Button variant="outline" className="w-full" onClick={googleSignIn}>
               Continue with Google
