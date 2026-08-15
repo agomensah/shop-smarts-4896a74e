@@ -67,7 +67,6 @@ function TrendsPage() {
   const sales = useMemo(() => data?.sales ?? [], [data]);
   const items = useMemo(() => data?.items ?? [], [data]);
 
-
   const todayKey = new Date().toDateString();
   const revenueToday = sales
     .filter((s) => new Date(s.created_at).toDateString() === todayKey)
