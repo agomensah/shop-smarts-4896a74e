@@ -44,12 +44,20 @@ function TrendsPage() {
     queryKey: ["trends", since],
     queryFn: async () => {
       const [sales, items] = await Promise.all([
-        supabase.from("sales").select("id, total, created_at").gte("created_at", since),
-        supabase.from("sale_items").select("product_name, quantity, line_total, created_at").gte("created_at", since),
+        supabase
+          .from("sales")
+          .select("id, total, created_at")
+          .is("voided_at", null)
+          .gte("created_at", since),
+        supabase
+          .from("sale_items")
+          .select("product_name, quantity, line_total, unit_cost, created_at, sale!inner(voided_at)")
+          .is("sale.voided_at", null)
+          .gte("created_at", since),
       ]);
       if (sales.error) throw sales.error;
       if (items.error) throw items.error;
-      return { sales: sales.data, items: items.data };
+      return { sales: sales.data, items: items.data as (typeof items.data)[number][] };
     },
   });
 
