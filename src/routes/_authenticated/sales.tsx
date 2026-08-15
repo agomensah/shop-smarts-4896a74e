@@ -164,7 +164,11 @@ function SalesPage() {
                           {sale.payment_method}
                         </Badge>
                       )}
-                      <span className="font-display text-lg font-semibold text-primary line-through decoration-2">
+                      <span
+                        className={`font-display text-lg font-semibold text-primary ${
+                          isVoided ? "line-through decoration-2" : ""
+                        }`}
+                      >
                         {formatCedis(sale.total)}
                       </span>
                       {isAdmin && !isVoided && (
