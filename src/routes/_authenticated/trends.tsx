@@ -71,6 +71,10 @@ function TrendsPage() {
   const revenue30 = sales.reduce((sum, s) => sum + Number(s.total), 0);
   const salesToday = sales.filter((s) => new Date(s.created_at).toDateString() === todayKey).length;
   const avgSale = sales.length ? revenue30 / sales.length : 0;
+  const profit30 = items.reduce(
+    (sum, i) => sum + (Number(i.line_total) - Number(i.unit_cost) * i.quantity),
+    0,
+  );
 
   const daily = useMemo(() => {
     const buckets = new Map<string, number>();
