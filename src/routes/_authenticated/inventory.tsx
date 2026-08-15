@@ -156,7 +156,7 @@ function InventoryPage() {
           </CardHeader>
           <CardContent>
             <form
-              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               onSubmit={(e) => {
                 e.preventDefault();
                 addProduct.mutate();
