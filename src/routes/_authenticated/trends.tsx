@@ -108,6 +108,7 @@ function TrendsPage() {
     { label: "Revenue today", value: formatCedis(revenueToday) },
     { label: "Sales today", value: String(salesToday) },
     { label: "Revenue (30 days)", value: formatCedis(revenue30) },
+    { label: "Profit (30 days)", value: formatCedis(profit30) },
     { label: "Average sale", value: formatCedis(avgSale) },
   ];
 
