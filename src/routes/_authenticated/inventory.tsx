@@ -41,6 +41,7 @@ type Product = {
   name: string;
   category: string;
   price: number;
+  cost_price: number;
   stock_quantity: number;
   low_stock_threshold: number;
 };
@@ -55,6 +56,7 @@ function InventoryPage() {
     name: "",
     category: "General",
     price: "",
+    cost_price: "",
     stock_quantity: "",
     low_stock_threshold: "5",
   });
@@ -64,7 +66,7 @@ function InventoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, category, price, stock_quantity, low_stock_threshold")
+        .select("id, name, category, price, cost_price, stock_quantity, low_stock_threshold")
         .order("name");
       if (error) throw error;
       return data as Product[];
@@ -81,6 +83,7 @@ function InventoryPage() {
         name: form.name.trim(),
         category: form.category.trim() || "General",
         price: Number(form.price) || 0,
+        cost_price: Number(form.cost_price) || 0,
         stock_quantity: Number(form.stock_quantity) || 0,
         low_stock_threshold: Number(form.low_stock_threshold) || 5,
       });
@@ -88,19 +91,27 @@ function InventoryPage() {
     },
     onSuccess: () => {
       toast.success("Product added");
-      setForm({ name: "", category: "General", price: "", stock_quantity: "", low_stock_threshold: "5" });
+      setForm({
+        name: "",
+        category: "General",
+        price: "",
+        cost_price: "",
+        stock_quantity: "",
+        low_stock_threshold: "5",
+      });
       invalidate();
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
   const restock = useMutation({
-    mutationFn: async ({ id, amount, current }: { id: string; amount: number; current: number }) => {
-      const { error } = await supabase
-        .from("products")
-        .update({ stock_quantity: Math.max(current + amount, 0) })
-        .eq("id", id);
-      if (error) throw error;
+    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
+      const { error } = await supabase.rpc("adjust_stock", {
+        _product_id: id,
+        _delta: amount,
+        _movement_type: "restock",
+      });
+      if (error) throw new Error(error.message);
     },
     onSuccess: invalidate,
     onError: (error: Error) => toast.error(error.message),
@@ -145,7 +156,7 @@ function InventoryPage() {
           </CardHeader>
           <CardContent>
             <form
-              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               onSubmit={(e) => {
                 e.preventDefault();
                 addProduct.mutate();
@@ -178,6 +189,18 @@ function InventoryPage() {
                   required
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cost_price">Cost (GHS)</Label>
+                <Input
+                  id="cost_price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={form.cost_price}
+                  onChange={(e) => setForm({ ...form, cost_price: e.target.value })}
                 />
               </div>
               <div className="space-y-1.5">
@@ -219,6 +242,7 @@ function InventoryPage() {
                 <TableHead>Product</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Margin</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead className="text-right">Restock</TableHead>
                 {isAdmin && <TableHead />}
@@ -227,7 +251,7 @@ function InventoryPage() {
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                     No products yet.
                   </TableCell>
                 </TableRow>
@@ -237,6 +261,20 @@ function InventoryPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="text-muted-foreground">{p.category}</TableCell>
                     <TableCell className="text-right">{formatCedis(p.price)}</TableCell>
+                    <TableCell className="text-right">
+                      {p.cost_price > 0 ? (
+                        <span className={p.price - p.cost_price < 0 ? "text-destructive" : undefined}>
+                          {formatCedis(p.price - p.cost_price)}
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            {p.price > 0
+                              ? `${Math.round(((p.price - p.cost_price) / p.price) * 100)}%`
+                              : "—"}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Set a cost</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant={p.stock_quantity <= p.low_stock_threshold ? "destructive" : "secondary"}>
                         {p.stock_quantity}
@@ -250,7 +288,7 @@ function InventoryPage() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              restock.mutate({ id: p.id, amount, current: p.stock_quantity })
+                              restock.mutate({ id: p.id, amount })
                             }
                           >
                             +{amount}
