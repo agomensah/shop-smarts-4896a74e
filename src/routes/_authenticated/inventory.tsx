@@ -192,6 +192,18 @@ function InventoryPage() {
                 />
               </div>
               <div className="space-y-1.5">
+                <Label htmlFor="cost_price">Cost (GHS)</Label>
+                <Input
+                  id="cost_price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={form.cost_price}
+                  onChange={(e) => setForm({ ...form, cost_price: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
                 <Label htmlFor="qty">Stock</Label>
                 <Input
                   id="qty"
