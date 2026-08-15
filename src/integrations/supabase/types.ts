@@ -17,6 +17,7 @@ export type Database = {
       products: {
         Row: {
           category: string
+          cost_price: number
           created_at: string
           id: string
           is_active: boolean
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          cost_price?: number
           created_at?: string
           id?: string
           is_active?: boolean
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          cost_price?: number
           created_at?: string
           id?: string
           is_active?: boolean
@@ -77,6 +80,7 @@ export type Database = {
           product_name: string
           quantity: number
           sale_id: string
+          unit_cost: number
           unit_price: number
         }
         Insert: {
@@ -87,6 +91,7 @@ export type Database = {
           product_name: string
           quantity: number
           sale_id: string
+          unit_cost?: number
           unit_price?: number
         }
         Update: {
@@ -97,6 +102,7 @@ export type Database = {
           product_name?: string
           quantity?: number
           sale_id?: string
+          unit_cost?: number
           unit_price?: number
         }
         Relationships: [
@@ -123,6 +129,9 @@ export type Database = {
           id: string
           payment_method: string
           total: number
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
         }
         Insert: {
           cashier_id: string
@@ -130,6 +139,9 @@ export type Database = {
           id?: string
           payment_method?: string
           total?: number
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
         }
         Update: {
           cashier_id?: string
@@ -137,8 +149,62 @@ export type Database = {
           id?: string
           payment_method?: string
           total?: number
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
         }
         Relationships: []
+      }
+      stock_movements: {
+        Row: {
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          delta: number
+          id: string
+          movement_type: Database["public"]["Enums"]["stock_movement_type"]
+          note: string | null
+          product_id: string
+          sale_id: string | null
+        }
+        Insert: {
+          balance_after: number
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          id?: string
+          movement_type: Database["public"]["Enums"]["stock_movement_type"]
+          note?: string | null
+          product_id: string
+          sale_id?: string | null
+        }
+        Update: {
+          balance_after?: number
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          id?: string
+          movement_type?: Database["public"]["Enums"]["stock_movement_type"]
+          note?: string | null
+          product_id?: string
+          sale_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -173,9 +239,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      record_sale: {
+        Args: { _items: Json; _payment_method: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "seller"
+      stock_movement_type: "sale" | "restock" | "correction" | "damage" | "void"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -304,6 +375,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "seller"],
+      stock_movement_type: ["sale", "restock", "correction", "damage", "void"],
     },
   },
 } as const
