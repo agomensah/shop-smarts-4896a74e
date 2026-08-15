@@ -230,6 +230,7 @@ function InventoryPage() {
                 <TableHead>Product</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Margin</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead className="text-right">Restock</TableHead>
                 {isAdmin && <TableHead />}
@@ -238,7 +239,7 @@ function InventoryPage() {
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
                     No products yet.
                   </TableCell>
                 </TableRow>
@@ -248,6 +249,20 @@ function InventoryPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="text-muted-foreground">{p.category}</TableCell>
                     <TableCell className="text-right">{formatCedis(p.price)}</TableCell>
+                    <TableCell className="text-right">
+                      {p.cost_price > 0 ? (
+                        <span className={p.price - p.cost_price < 0 ? "text-destructive" : undefined}>
+                          {formatCedis(p.price - p.cost_price)}
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            {p.price > 0
+                              ? `${Math.round(((p.price - p.cost_price) / p.price) * 100)}%`
+                              : "—"}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Set a cost</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant={p.stock_quantity <= p.low_stock_threshold ? "destructive" : "secondary"}>
                         {p.stock_quantity}
