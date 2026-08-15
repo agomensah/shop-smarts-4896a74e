@@ -97,7 +97,7 @@ function SalesPage() {
     mutationFn: async (saleId: string) => {
       const { error } = await supabase.rpc("void_sale", {
         _sale_id: saleId,
-        _reason: voidReasons[saleId]?.trim() || undefined,
+        _reason: voidReasons[saleId]?.trim() ?? "",
       });
       if (error) throw new Error(error.message);
     },
