@@ -119,7 +119,7 @@ function TrendsPage() {
         <p className="text-sm text-muted-foreground">Last 30 days of school shop activity</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.label} className="shadow-card">
             <CardContent className="py-5">
