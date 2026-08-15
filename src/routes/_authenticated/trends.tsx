@@ -64,8 +64,9 @@ function TrendsPage() {
     },
   });
 
-  const sales = data?.sales ?? [];
-  const items = data?.items ?? [];
+  const sales = useMemo(() => data?.sales ?? [], [data]);
+  const items = useMemo(() => data?.items ?? [], [data]);
+
 
   const todayKey = new Date().toDateString();
   const revenueToday = sales
