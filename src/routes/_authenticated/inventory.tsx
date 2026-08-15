@@ -261,7 +261,7 @@ function InventoryPage() {
                             size="sm"
                             variant="outline"
                             onClick={() =>
-                              restock.mutate({ id: p.id, amount, current: p.stock_quantity })
+                              restock.mutate({ id: p.id, amount })
                             }
                           >
                             +{amount}
